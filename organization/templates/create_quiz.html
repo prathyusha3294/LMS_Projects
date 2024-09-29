@@ -1,0 +1,121 @@
+<h2 style="text-align: center; color: #333;">Create Quiz</h2>
+<form id="createQuizForm" method="post" style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 10px; background-color: #f9f9f9;">
+    {% csrf_token %}
+    
+    <label for="title" style="display: block; margin-bottom: 10px; color: #555; font-weight: bold;">Quiz Title</label>
+    <input type="text" name="title" id="title" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">
+
+    <label for="marks" style="display: block; margin-bottom: 10px; color: #555; font-weight: bold;">Total Marks</label>
+    <input type="number" name="marks" id="marks" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">
+
+    <label for="course" style="display: block; margin-bottom: 10px; color: #555; font-weight: bold;">Course</label>
+    <select name="course" id="course" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">
+        {% for course in courses %}
+        <option value="{{ course.id }}">{{ course.name }}</option>
+        {% endfor %}
+    </select>
+
+    <!-- Questions section -->
+    <div id="questionsContainer"></div>
+
+    <!-- Button to add a new question -->
+    <button type="button" id="addQuestionBtn" style="width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; font-size: 16px; margin-bottom: 15px;">Add Another Question</button>
+
+    <button type="submit" style="width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 5px; font-size: 16px;">Create Quiz</button>
+</form>
+
+<!-- jQuery (ensure it's included) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script type="text/javascript">
+    let questionCount = 0;
+
+    $(document).ready(function() {
+        // Function to add question fields dynamically
+        function addQuestion() {
+            questionCount++;
+            const questionHtml = `
+                <div class="questionItem" style="margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    <label style="display: block; color: #555; font-weight: bold;">Question ${questionCount}</label>
+                    <textarea name="questions[${questionCount}][question_text]" required style="width: 100%; padding: 10px; margin-bottom: 10px;" placeholder="Type your question here"></textarea>
+                    
+                    <label style="display: block; color: #555; font-weight: bold;">Options</label>
+                    
+                    <label for="option1-${questionCount}" style="display: block;"></label>
+                    <input id="option1-${questionCount}" type="text" name="questions[${questionCount}][options][0]" required style="width: 100%; padding: 10px; margin-bottom: 10px;" placeholder="Option 1" />
+                    
+                    <label for="option2-${questionCount}" style="display: block;"></label>
+                    <input id="option2-${questionCount}" type="text" name="questions[${questionCount}][options][1]" required style="width: 100%; padding: 10px; margin-bottom: 10px;" placeholder="Option 2" />
+                    
+                    <label for="option3-${questionCount}" style="display: block;"></label>
+                    <input id="option3-${questionCount}" type="text" name="questions[${questionCount}][options][2]" required style="width: 100%; padding: 10px; margin-bottom: 10px;" placeholder="Option 3" />
+                    
+                    <label for="option4-${questionCount}" style="display: block;"></label>
+                    <input id="option4-${questionCount}" type="text" name="questions[${questionCount}][options][3]" required style="width: 100%; padding: 10px; margin-bottom: 10px;" placeholder="Option 4" />
+                    
+                    <label for="correctAnswer-${questionCount}" style="display: block; color: #555; font-weight: bold;">Correct Answer</label>
+                    <input id="correctAnswer-${questionCount}" type="text" name="questions[${questionCount}][correct_answer]" required style="width: 100%; padding: 10px; margin-bottom: 10px;" placeholder="Correct answer" />
+        
+                    <label for="points-${questionCount}" style="display: block; color: #555; font-weight: bold;">Points</label>
+                    <input id="points-${questionCount}" type="number" name="questions[${questionCount}][points]" required style="width: 100%; padding: 10px; margin-bottom: 10px;" placeholder="Points" />
+                </div>`;
+            
+            // Append the question fields to the container
+            $('#questionsContainer').append(questionHtml);
+        }
+
+        // Trigger addQuestion on button click
+        $('#addQuestionBtn').click(addQuestion);
+
+        // Add one question by default on page load
+        addQuestion();
+
+        // Handle form submission to send JSON data
+        $('#createQuizForm').on('submit', function(e) {
+            e.preventDefault(); // Prevent default form submission
+
+            // Collect form data
+            const quizData = {
+                title: $('#title').val(),
+                marks: $('#marks').val(),
+                course: $('#course').val(),
+                questions: []
+            };
+
+            // Collect each question
+            $('.questionItem').each(function() {
+                const question = {
+                    question_text: $(this).find('textarea').val(),
+                    options: [
+                        $(this).find('input[name*="options"][id*="option1"]').val(),
+                        $(this).find('input[name*="options"][id*="option2"]').val(),
+                        $(this).find('input[name*="options"][id*="option3"]').val(),
+                        $(this).find('input[name*="options"][id*="option4"]').val()
+                    ],
+                    correct_answer: $(this).find('input[name*="correct_answer"]').val(),
+                    points: $(this).find('input[name*="points"]').val()
+                };
+                quizData.questions.push(question);
+            });
+
+            // Send the data via AJAX
+            $.ajax({
+                url: '/api/master/quiz/',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(quizData),  // Send the data as JSON
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'  // Include the CSRF token for security
+                },
+                success: function(response) {
+                    alert('Quiz created successfully!');
+                    // You can redirect or reset the form here
+                },
+                error: function(response) {
+                    console.error('Error:', response);
+                    alert('Error creating quiz. Please check the form and try again.');
+                }
+            });
+        });
+    });
+</script>

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h2>Teacher Dashboard</h2>
+    <h3>Your Courses</h3>
+    <ul id="courseList">
+        {% for course in courses %}
+        <li><span>{{ course.name }}</span> - {{ course.description }}</li>
+        {% endfor %}
+    </ul>
+
+    <div style="text-align: center;">
+        <!-- Direct link to the create course page -->
+        <a href="/api/master/course/create" class="btn">Create Course</a>
+    </div>
+    <div style="text-align: center;">
+        <!-- Direct link to the view student report page -->
+        <a href="/api/performance/report/" class="btn">View Student Report</a>
+    </div>
+    
+    <!-- Container to load the course creation form -->
+    <div id="courseFormContainer"></div>
+</div>
+{% endblock %}
+
+<!-- Include jQuery to handle the AJAX -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        // Handle the form submission
+        $(document).on('submit', '#courseForm', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            $.ajax({
+                url: '',  // URL to submit the form
+                method: 'POST',
+                data: $(this).serialize(),  // Serialize form data
+                success: function(response) {
+                    // Add the new course to the course list
+                    $('#courseList').append('<li><span>' + response.name + '</span> - ' + response.description + '</li>');
+                    $('#courseFormContainer').empty(); // Clear the form after submission
+                },
+                error: function(xhr) {
+                    alert('Failed to create course. Please try again.');
+                }
+            });
+        });
+    });
+</script>

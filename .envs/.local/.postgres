@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=lms_fullstack
+POSTGRES_USER=RQDBWGGGDexKhLTgecunRNzdZRevpBUB
+POSTGRES_PASSWORD=TVVnYChEXankN7QVJdr1WBQtIGRopK5SW3wh21Ph7cTCDicqVbs4SgLpNLsR2veE

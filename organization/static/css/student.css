@@ -1,0 +1,103 @@
+/* General Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif; /* Use a clean, modern font */
+}
+
+/* Body Styling */
+body {
+    background-color: #f4f4f4; /* Light background for contrast */
+    color: #333; /* Dark text color for readability */
+}
+
+/* Dashboard Container */
+.dashboard-container {
+    max-width: 800px; /* Limit the width for better readability */
+    margin: 0 auto; /* Center the container */
+    padding: 20px;
+    background: white; /* White background for the dashboard */
+    border-radius: 8px; /* Slightly rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+/* Headings */
+h1, h3 {
+    text-align: center; /* Center align headings */
+    margin-bottom: 20px;
+    color: #0056b3; /* Dark blue color for headings */
+}
+
+/* Course List */
+ul {
+    list-style-type: none; /* Remove bullet points */
+}
+
+li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd; /* Light grey line between courses */
+    display: flex;
+    justify-content: space-between; /* Space between course details and button */
+    align-items: center; /* Vertically align items */
+}
+
+li:last-child {
+    border-bottom: none; /* Remove border from the last item */
+}
+
+/* Button Styling */
+.take-quiz-btn {
+    background-color: #28a745; /* Green background */
+    color: white; /* White text */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Slightly rounded corners */
+    padding: 10px 15px; /* Padding for the button */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Smooth transition for background */
+}
+
+.take-quiz-btn:hover {
+    background-color: #218838; /* Darker green on hover */
+}
+
+/* Quiz Container */
+#quiz-container {
+    margin-top: 30px; /* Space above quiz container */
+    padding: 20px;
+    background: #fff; /* White background for quiz area */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+}
+
+/* Quiz Title */
+#quiz-title {
+    margin-bottom: 15px; /* Space below the title */
+    color: #333; /* Dark text */
+}
+
+/* Quiz Form */
+#quiz-form p {
+    margin: 10px 0; /* Space above and below question */
+}
+
+label {
+    display: block; /* Make labels block elements for better spacing */
+    margin: 5px 0; /* Space between options */
+}
+
+/* Submit Button */
+#submit-quiz {
+    margin-top: 20px; /* Space above the submit button */
+    padding: 10px 15px;
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white; /* White text */
+    border: none;
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+#submit-quiz:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
