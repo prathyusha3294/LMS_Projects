@@ -10,22 +10,70 @@
     <h2 id="quiz-title" style="color: #333; font-size: 24px; margin-bottom: 20px; font-family: Arial, sans-serif;">Take Quiz: {{ quiz.title }}</h2>
     
     <div id="questions-container" style="margin-top: 20px; text-align: left;">
-        {% for question in quiz.questions %}
-        <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background-color: #fff;">
-            <p style="font-weight: bold; margin-bottom: 8px;">{{ question.question_text }}</p>
-            {% for option in question.options %}
-                <label style="display: block; margin-bottom: 5px; cursor: pointer;">
-                    <input type="radio" name="question_{{ question.id }}" value="{{ option }}" style="margin-right: 8px;">
-                    {{ option }}
-                </label>
+        <form id="quizForm" onsubmit="submitQuiz(event)">
+            {% for question in quiz.questions %}
+            <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background-color: #fff;">
+                <p style="font-weight: bold; margin-bottom: 8px;">{{ question.question_text }}</p>
+                {% for option in question.options %}
+                    <label style="display: block; margin-bottom: 5px; cursor: pointer;">
+                        <input type="radio" name="question_{{ question.id }}" value="{{ option }}" style="margin-right: 8px;" required>
+                        {{ option }}
+                    </label>
+                {% endfor %}
+            </div>
             {% endfor %}
-        </div>
-        {% endfor %}
+            <input type="hidden" name="quiz_id" value="{{ quiz.id }}"> <!-- Include quiz ID -->
+            <button type="submit" class="submission-btn" 
+            style="display: block; background-color: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 20px;">
+            Submit Quiz
+            </button>
+        </form>
     </div>
-    
-    <button class="submission-btn" 
-    style="display: block; background-color: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 20px;"
-    onclick="window.location.href='/api/submission/'">
-Submit Quiz
-</button>
+</div>
+
+<script>
+    function submitQuiz(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        const formData = new FormData(document.getElementById('quizForm'));
+        const answers = {};
+        const quizId = formData.get('quiz_id'); // Fetch the quiz ID
+
+        // Collect answers from the form
+        formData.forEach((value, key) => {
+            if (key.startsWith('question_')) {
+                answers[key.split('_')[1]] = value; // Use question ID as key
+            }
+        });
+
+        // Prepare the data to be sent
+        const data = {
+            course_name: '{{ quiz.title }}', // Use the quiz title as the course name
+            answers: answers,
+        };
+
+        fetch('/api/submission/', {  // Your API endpoint for submitting the quiz
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',  // Include CSRF token for security
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert('Quiz submitted successfully! Marks awarded: ' + data.marks_awarded);  // Show success alert with marks
+            window.location.href = '/'; // Redirect to the homepage or quiz results page
+        })
+        .catch(error => {
+            console.error('Error submitting quiz:', error);
+            alert('There was an error submitting the quiz. Please try again.');
+        });
+    }
+</script>
 {% endblock %}

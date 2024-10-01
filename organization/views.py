@@ -146,23 +146,39 @@ class StudentQuizSubmissionViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         student = request.user  # Assuming authenticated student
-        quiz = Quiz.objects.get(id=request.data['quiz'])
-        answers = request.data['answers']
+        course_name = request.data.get('course_name')  # Get course name from request data
+
+        try:
+            # Fetch the course based on the course name
+            course = Course.objects.get(name=course_name)
+            # Fetch the quiz where the title matches the course name
+            quiz = Quiz.objects.get(course=course, title=course.name)
+        except Course.DoesNotExist:
+            return Response({"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Quiz.DoesNotExist:
+            return Response({"error": "Quiz not found for this course"}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Process the answers submitted by the student
+        answers = request.data.get('answers')
         questions = Question.objects.filter(quiz=quiz)
+        
         marks_awarded = 0
         for question in questions:
-            submitted_answer = answers.get(str(question.id))  # Get the answer from the submitted answers
+            submitted_answer = answers.get(str(question.id))  # Get the answer for the question from the submitted answers
             if submitted_answer == question.correct_answer:  # Check if the answer is correct
-                marks_awarded += question.points  # Add points for the correct answer
+                marks_awarded += question.points  # Add points for correct answers
+
+        # Create the submission
         submission = StudentQuizSubmission.objects.create(
             student=student,
             quiz=quiz,
             answers=answers,
-            marks_awarded=marks_awarded  # Set the calculated marks
+            marks_awarded=marks_awarded
         )
         
+        # Return the success response with the marks awarded
         return Response({'message': 'Submission successful', 'marks_awarded': marks_awarded}, status=status.HTTP_201_CREATED)
-    
+
 
 class PerformanceReportViewSet(viewsets.ModelViewSet):
     queryset = PerformanceReport.objects.all()
