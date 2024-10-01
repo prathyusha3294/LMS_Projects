@@ -5,6 +5,10 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = ['id', 'name', 'description', 'teacher']
+        extra_kwargs = {
+            'teacher': {'read_only': True}  # Set the teacher field as read-only
+        }
+        
 
 
 

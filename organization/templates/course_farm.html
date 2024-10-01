@@ -18,7 +18,7 @@
     </ul>
     
     <h2>Create a New Course</h2>
-    <form id="courseForm" action="" method="post">
+    <form id="courseForm" onsubmit="createCourse(event)">
         {% csrf_token %}
         <div style="text-align: center; margin-bottom: 20px; color:black">
             <label for="name">Course Name:</label>
@@ -34,6 +34,38 @@
             <button type="submit" class="btn">Create Course</button>
         </div>
     </form>
+    <script>
+        function createCourse(event) {
+            event.preventDefault();  // Prevent the default form submission
+        
+            const name = document.getElementById('name').value;
+            const description = document.getElementById('description').value;
+        
+            fetch('/api/master/course/create/', {  // Your API endpoint for creating a course
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',  // Include CSRF token for security
+                },
+                body: JSON.stringify({ name: name, description: description }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Course created successfully!');  // Show success alert
+                document.getElementById('courseForm').reset();  // Reset the form
+                // Optionally, you can refresh the page or update the course list here
+            })
+            .catch(error => {
+                console.error('Error creating course:', error);
+                alert('There was an error creating the course. Please try again.');
+            });
+        }
+        </script>            
 
    
 {% endblock %}
