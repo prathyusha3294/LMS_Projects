@@ -1,29 +1,31 @@
-{% extends "studentbase.html" %}
-
 {% load static %}
-
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Submission</title>
+</head>
 {% block content %}
-<div style="text-align: center; color: black; max-width: 600px; margin: auto; padding: 20px; background-color: #f9f9f9; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-    <h2 style="color: #333; font-size: 24px; margin-bottom: 20px;">Take Quiz: {{ quiz.title }}</h2>
+<div class="quiz-container" style="text-align: center; color: black; max-width: 600px; margin: auto; padding: 20px; background-color: #f9f9f9; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <h2 id="quiz-title" style="color: #333; font-size: 24px; margin-bottom: 20px; font-family: Arial, sans-serif;">Take Quiz: {{ quiz.title }}</h2>
     
-    <form method="post" action="{% url 'lms:student-detail' %}">
-        {% csrf_token %}
-        {% for question in quiz.questions.all %}
-        <div style="margin-bottom: 20px;">
-            <p style="font-size: 18px; font-weight: bold; color: #444;">{{ question.question_text }}</p>
-            <ul style="list-style-type: none; padding: 0; text-align: left;">
-                {% for option in question.options %}
-                <li style="margin: 8px 0;">
-                    <label style="font-size: 16px; cursor: pointer;">
-                        <input type="radio" name="question_{{ question.id }}" value="{{ option }}" style="margin-right: 10px;">
-                        {{ option }}
-                    </label>
-                </li>
-                {% endfor %}
-            </ul>
+    <div id="questions-container" style="margin-top: 20px; text-align: left;">
+        {% for question in quiz.questions %}
+        <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background-color: #fff;">
+            <p style="font-weight: bold; margin-bottom: 8px;">{{ question.question_text }}</p>
+            {% for option in question.options %}
+                <label style="display: block; margin-bottom: 5px; cursor: pointer;">
+                    <input type="radio" name="question_{{ question.id }}" value="{{ option }}" style="margin-right: 8px;">
+                    {{ option }}
+                </label>
+            {% endfor %}
         </div>
         {% endfor %}
-        <button type="submit" style="background-color: #4CAF50; color: white; border: none; padding: 10px 20px; font-size: 16px; cursor: pointer; border-radius: 5px; margin-top: 20px;">Submit Quiz</button>
-    </form>
-</div>
+    </div>
+    
+    <button class="submission-btn" 
+    style="display: block; background-color: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 20px;"
+    onclick="window.location.href='/api/submission/'">
+Submit Quiz
+</button>
 {% endblock %}

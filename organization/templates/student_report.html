@@ -1,0 +1,157 @@
+{% comment %} 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Performance Report</title>
+    {% load static %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        .comments {
+            margin-top: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Performance Report</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Quiz Title</th>
+                    <th>Score</th>
+                    <th>Comments</th>
+                </tr>
+            </thead>
+            <tbody id="report-body">
+                <!-- Report rows will be added here -->
+            </tbody>
+        </table>
+        <div class="comments" id="comments-section"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchStudentQuizSubmissions();
+        });
+
+        function fetchStudentQuizSubmissions() {
+            // Fetch data from the new API endpoint
+            fetch('/api/get-submission/')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const reportBody = document.getElementById('report-body');
+                    const commentsSection = document.getElementById('comments-section');
+
+                    // Clear existing data
+                    reportBody.innerHTML = '';
+                    commentsSection.innerHTML = '';
+
+                    // Populate the report
+                    data.forEach(submission => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${submission.student_name}</td>
+                            <td>${submission.quiz.title}</td>
+                            <td>${submission.score}</td>
+                            <td>${submission.comments || 'No comments'}</td>
+                        `;
+                        reportBody.appendChild(row);
+                    });
+
+                    // Show any overall comments (optional, depending on your API data)
+                    // Example if there are overall comments for all submissions
+                    // commentsSection.innerText = `Overall Comments: ${data.overall_comments}`;
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Submission</title>
+</head>
+{% block content %}
+<div class="quiz-container" style="text-align: center; color: black; max-width: 600px; margin: auto; padding: 20px; background-color: #f9f9f9; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <h2 id="quiz-title" style="color: #333; font-size: 24px; margin-bottom: 20px; font-family: Arial, sans-serif;">Take Quiz: {{ quiz.title }}</h2>
+    
+    <div id="questions-container" style="margin-top: 20px; text-align: left;">
+        {% for question in quiz.questions %}
+        <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background-color: #fff;">
+            <p style="font-weight: bold; margin-bottom: 8px;">{{ question.question_text }}</p>
+            {% for option in question.options %}
+                <label style="display: block; margin-bottom: 5px; cursor: pointer;">
+                    <input type="radio" name="question_{{ question.id }}" value="{{ option }}" style="margin-right: 8px;">
+                    {{ option }}
+                </label>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+    
+    <button id="submit-button" 
+    style="display: block; background-color: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 20px;">
+    Submit Quiz
+    </button>
+
+
+</div>
+{% endblock %}  {% endcomment %}

@@ -1,5 +1,4 @@
 {% extends "studentbase.html" %}
-
 {% load static %}
 {% block content %}
 <div class="dashboard-container" style="max-width: 800px; margin: 20px auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
@@ -10,12 +9,13 @@
         <li style="padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between;">
             <span style="color: #333;">{{ course.name }}</span> - {{ course.description }}
             <span>
-                <button class="take-quiz-btn" 
-        data-course-id="{{ course.id }}" 
-        data-course-title="{{ course.name }}" 
-        style="background-color: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">
-            Take Quiz
-        </button>
+                {% for quiz in course.quiz_set.all %}
+                    <button class="take-quiz-btn" 
+                            style="background-color: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;"
+                            onclick="window.location.href='/api/getquiz/{{ quiz.id }}'">
+                        Take Quiz
+                    </button>
+                {% endfor %}
             </span>
         </li>
         {% endfor %}
@@ -29,10 +29,10 @@
         {% csrf_token %}
         <!-- Quiz questions will be injected here by JavaScript -->
     </form>
-    <button id="submit-quiz" style="display: none; background-color: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">
+    {% comment %} <button id="submit-quiz" style="display: none; background-color: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">
         Submit Quiz
-    </button>
+    </button> {% endcomment %}
 </div>
 
-<script src="{% static 'js/quiz.js' %}"></script>
+{% comment %} <script src="{% static 'js/quiz.js' %}"></script> {% endcomment %}
 {% endblock %}

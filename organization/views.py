@@ -96,7 +96,8 @@ class GetQuizViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Retr
         # Fetch a single quiz by ID
         quiz = self.get_object()
         serializer = self.get_serializer(quiz)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # return Response(serializer.data, status=status.HTTP_200_OK)
+        return render(request, 'take_quiz.html', {'quiz': serializer.data})
 
 # This viewset renders the quiz page based on quiz ID
 class QuizRetrieveViewSet(viewsets.ViewSet):
@@ -132,20 +133,36 @@ class QuizRetrieveViewSet(viewsets.ViewSet):
 class StudentQuizSubmissionViewSet(viewsets.ModelViewSet):
     queryset = StudentQuizSubmission.objects.all()
     serializer_class = StudentQuizSubmissionSerializer
+    
+    def list(self, request, *args, **kwargs):
+        quiz_id = request.query_params.get('quiz_id')
+        if quiz_id:
+            submission = StudentQuizSubmission.objects.filter(student=request.user, quiz_id=quiz_id)
+        else:
+            submission = StudentQuizSubmission.objects.filter(student=request.user)
+        serializer = self.get_serializer(submission, many=True)
+        # return Response(serializer.data)
+        return render(request, 'quiz_submit.html', {'reports': serializer.data})
 
     def create(self, request, *args, **kwargs):
         student = request.user  # Assuming authenticated student
         quiz = Quiz.objects.get(id=request.data['quiz'])
         answers = request.data['answers']
-
-        # Create the submission record
+        questions = Question.objects.filter(quiz=quiz)
+        marks_awarded = 0
+        for question in questions:
+            submitted_answer = answers.get(str(question.id))  # Get the answer from the submitted answers
+            if submitted_answer == question.correct_answer:  # Check if the answer is correct
+                marks_awarded += question.points  # Add points for the correct answer
         submission = StudentQuizSubmission.objects.create(
             student=student,
             quiz=quiz,
             answers=answers,
-            marks_awarded=0  # Initially 0, teacher will assign marks later
+            marks_awarded=marks_awarded  # Set the calculated marks
         )
-        return Response({'message': 'Submission successful'}, status=status.HTTP_201_CREATED)
+        
+        return Response({'message': 'Submission successful', 'marks_awarded': marks_awarded}, status=status.HTTP_201_CREATED)
+    
 
 class PerformanceReportViewSet(viewsets.ModelViewSet):
     queryset = PerformanceReport.objects.all()
@@ -154,7 +171,8 @@ class PerformanceReportViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         reports = PerformanceReport.objects.filter(student=request.user)
         serializer = self.get_serializer(reports, many=True)
-        return Response(serializer.data)
+        # return Response(serializer.data)
+        return render(request, 'student_report.html', {'reports': serializer.data})
 
     def create(self, request, *args, **kwargs):
         quiz = Quiz.objects.get(id=request.data['quiz'])
