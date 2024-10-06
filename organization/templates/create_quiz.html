@@ -10,6 +10,7 @@
 
     <label for="course" style="display: block; margin-bottom: 10px; color: #555; font-weight: bold;">Course</label>
     <select name="course" id="course" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">
+        <option value="" disabled selected>Select a course</option>
         {% for course in courses %}
         <option value="{{ course.id }}">{{ course.name }}</option>
         {% endfor %}

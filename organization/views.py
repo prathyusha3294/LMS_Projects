@@ -157,7 +157,7 @@ class StudentQuizSubmissionViewSet(viewsets.ModelViewSet):
             return Response({"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND)
         except Quiz.DoesNotExist:
             return Response({"error": "Quiz not found for this course"}, status=status.HTTP_404_NOT_FOUND)
-        
+
         # Process the answers submitted by the student
         answers = request.data.get('answers')
         questions = Question.objects.filter(quiz=quiz)
@@ -205,7 +205,6 @@ class PerformanceReportViewSet(viewsets.ModelViewSet):
             quiz=quiz,
             total_marks=total_marks,
             marks_obtained=marks_obtained,
-            grade=grade
         )
         return Response({'message': 'Report created successfully'}, status=status.HTTP_201_CREATED)
 
