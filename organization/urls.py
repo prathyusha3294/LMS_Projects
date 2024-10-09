@@ -28,14 +28,21 @@ student_submission_router.register('submission',StudentQuizSubmissionViewSet,bas
 performance_report_router = routers.SimpleRouter()
 performance_report_router.register('performance/report',PerformanceReportViewSet, basename='performance')
 
+teacher_router = routers.SimpleRouter()
+teacher_router.register('master/teacher',TeacherViewset, basename='teacher')
+
+signup_report_router = routers.SimpleRouter()
+signup_report_router.register('signup',UserSignUpViewSet, basename='usersignup')
+
 
 urlpatterns = [
     path('',include(course_create_router.urls)),
-    # path('',include(teacher_router.urls)),
+    path('',include(teacher_router.urls)),
     path('',include(quiz_router.urls)),
     path('',include(quizretrive_router.urls)),
     path('',include(get_quiz_router.urls)),
     path('',include(student_router.urls)),
     path('',include(student_submission_router.urls)),
-    path('',include(performance_report_router.urls))
+    path('',include(performance_report_router.urls)),
+    path('',include(signup_report_router.urls))
 ]

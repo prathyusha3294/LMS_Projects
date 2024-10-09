@@ -45,3 +45,13 @@ class PerformanceReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = PerformanceReport
         fields = ['student', 'quiz', 'total_marks', 'marks_obtained', 'grade']
+
+class UserSignUpSerializer(serializers.Serializer):
+    role = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, required=True)
+    mobile = serializers.CharField(required=False,allow_blank=True)
+    email = serializers.CharField(required=True)
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+    state = serializers.CharField(required=True)
+    country = serializers.CharField(required=True)

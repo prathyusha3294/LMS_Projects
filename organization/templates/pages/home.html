@@ -1,49 +1,133 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LMS Home</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
 
-{% block content %}
-<div class="dashboard-container">
-    <h2>Teacher Dashboard</h2>
-    <h3>Your Courses</h3>
-    <ul id="courseList">
-        {% for course in courses %}
-        <li><span>{{ course.name }}</span> - {{ course.description }}</li>
-        {% endfor %}
-    </ul>
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #007bff;
+            padding: 10px 20px;
+            color: white;
+        }
 
-    <div style="text-align: center;">
-        <!-- Direct link to the create course page -->
-        <a href="/api/master/course/create" class="btn">Create Course</a>
-    </div>
-    <div style="text-align: center;">
-        <!-- Direct link to the view student report page -->
-        {% comment %} <a href="/api/performance/report/" class="btn">View Student Report</a> {% endcomment %}
-    </div>
-    
-    <!-- Container to load the course creation form -->
-    <div id="courseFormContainer"></div>
-</div>
-{% endblock %}
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            font-weight: bold;
+        }
 
-<!-- Include jQuery to handle the AJAX -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script type="text/javascript">
-    $(document).ready(function(){
-        // Handle the form submission
-        $(document).on('submit', '#courseForm', function(event) {
-            event.preventDefault(); // Prevent the default form submission
-            $.ajax({
-                url: '',  // URL to submit the form
-                method: 'POST',
-                data: $(this).serialize(),  // Serialize form data
-                success: function(response) {
-                    // Add the new course to the course list
-                    $('#courseList').append('<li><span>' + response.name + '</span> - ' + response.description + '</li>');
-                    $('#courseFormContainer').empty(); // Clear the form after submission
-                },
-                error: function(xhr) {
-                    alert('Failed to create course. Please try again.');
-                }
-            });
-        });
-    });
-</script>
+        .navbar a:hover {
+            background-color: #0056b3;
+            border-radius: 4px;
+        }
+
+        .hero-section {
+            background: url('https://example.com/hero-image.jpg') no-repeat center center/cover;
+            height: 80vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            background-blend-mode: darken;
+        }
+
+        .hero-section h1 {
+            font-size: 48px;
+            margin: 0;
+        }
+
+        .hero-section p {
+            font-size: 20px;
+            margin-top: 10px;
+        }
+
+        .container {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .container h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .courses-grid {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .course {
+            background-color: #f4f4f4;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 200px;
+            text-align: center;
+        }
+
+        .course img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .course h3 {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+
+        .course p {
+            font-size: 14px;
+        }
+
+        footer {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <a href="#">LMS</a>
+        </div>
+        <div class="nav-links">
+            <a href="#">Home</a>
+            <a href="api/master/course/create">Courses</a>
+            <a href="/api/login/">Login</a>
+            <a href="/api/signup/">Register</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div>
+            <h1>Welcome to LMS</h1>
+            <p>Discover courses, enhance your skills, and learn at your own pace.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 LMS. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>

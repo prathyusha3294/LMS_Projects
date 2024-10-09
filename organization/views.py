@@ -8,6 +8,8 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status,mixins
 from django.shortcuts import get_object_or_404, render
+from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.models import Group
 
 class CreateCourseViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -27,29 +29,6 @@ class CreateCourseViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # def retrieve(self, request, *args, **kwargs):
-    #     return render(request, 'create_course.html')
-    
-# Teacher Views
-# class TeacherCourseViewSet(viewsets.ModelViewSet):
-#     serializer_class = CourseSerializer
-#     permission_classes = [AllowAny]
-
-#     def get_queryset(self):
-#         # Only show courses for the authenticated teacher
-#         return Course.objects.filter(teacher=self.request.user)
-
-#     def list(self, request, *args, **kwargs):
-#         courses = self.get_queryset()
-#         return render(request, 'create_farm.html', {'courses': courses})
-
-#     def create(self, request, *args, **kwargs):
-#         # Overriding the create method to handle course creation
-#         serializer = self.get_serializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save(teacher=request.user)  # Assign the course to the logged-in teacher
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class QuizViewSet(viewsets.ModelViewSet):
     serializer_class = QuizSerializer
@@ -67,8 +46,10 @@ class QuizViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
-
-# Student Views
+class TeacherViewset(viewsets.ViewSet):
+    def list(self, request, *args, **kwargs):
+        return render(request, 'teacher_dashboard.html')
+    
 class StudentCourseViewSet(viewsets.ReadOnlyModelViewSet):  # Only allows read operations
     serializer_class = CourseSerializer
     permission_classes = [IsAuthenticated]
@@ -115,21 +96,6 @@ class QuizRetrieveViewSet(viewsets.ViewSet):
         # Render the quiz in the 'take_quiz.html' template with serialized data
         return render(request, 'take_quiz.html', {'quiz': serializer.data})
 
-# Submission Views
-# class SubmissionViewSet(viewsets.ReadOnlyModelViewSet):  # Only allows read operations
-#     serializer_class = SubmissionSerializer
-#     permission_classes = [IsAuthenticated]
-
-#     def get_queryset(self):
-#         # Show submissions for the logged-in student
-#         return Submission.objects.filter(student=self.request.user)
-
-#     def list(self, request, *args, **kwargs):
-#         submissions = self.get_queryset()
-#         return render(request, 'view_marks.html', {'submissions': submissions})
-    
-
-
 class StudentQuizSubmissionViewSet(viewsets.ModelViewSet):
     queryset = StudentQuizSubmission.objects.all()
     serializer_class = StudentQuizSubmissionSerializer
@@ -164,11 +130,9 @@ class StudentQuizSubmissionViewSet(viewsets.ModelViewSet):
         
         marks_awarded = 0
         for question in questions:
-            submitted_answer = answers.get(str(question.id))  # Get the answer for the question from the submitted answers
-            if submitted_answer == question.correct_answer:  # Check if the answer is correct
-                marks_awarded += question.points  # Add points for correct answers
-
-        # Create the submission
+            submitted_answer = answers.get(str(question.id)) 
+            if submitted_answer == question.correct_answer:
+                marks_awarded += question.points  
         submission = StudentQuizSubmission.objects.create(
             student=student,
             quiz=quiz,
@@ -218,3 +182,58 @@ class PerformanceReportViewSet(viewsets.ModelViewSet):
             return 'C'
         else:
             return 'F'
+        
+        
+class UserSignUpViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
+    permission_classes = [AllowAny]
+    queryset = get_user_model().objects.all()
+    serializer_class = UserSignUpSerializer
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        return render(request, 'signup.html', {'queryset': queryset})
+
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.validated_data.get('email')
+        password = serializer.validated_data.get('password')  # Changed from create_password to password
+        # confirm_password = serializer.validated_data.get('confirm_password')
+        role_name = serializer.validated_data.get('role')
+        first_name = serializer.validated_data.get('first_name')
+        last_name = serializer.validated_data.get('last_name')
+        state = serializer.validated_data.get('state')
+        country = serializer.validated_data.get('country')
+
+        if get_user_model().objects.filter(email=email).exists():
+            return Response({"error": "User with this email already exists"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the passwords match
+        # if password != confirm_password:
+        #     return Response({"error": "Passwords do not match"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create the user instance with the hashed password
+        user = Company.objects.create(
+            first_name=first_name,
+            last_name=last_name,
+            state=state,
+            country=country
+        )
+        user = get_user_model().objects.create_user(
+            username=serializer.validated_data['email'],
+            email=serializer.validated_data['email'],
+            password=password
+        )
+
+        # Assign the selected role (group) to the user
+        try:
+            group = Group.objects.get(name=role_name)
+            user.groups.add(group)  # Assign the role (group) to the user
+        except Group.DoesNotExist:
+            return Response({"error": "Invalid role selected"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Save the user to the database
+        user.save()
+        # return Response({"message": "User Created Successfully"}, status=status.HTTP_201_CREATED)
+        return Response({"message": "User Created Successfully"}, status=status.HTTP_201_CREATED)

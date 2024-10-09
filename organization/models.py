@@ -3,6 +3,13 @@ from django.db import models
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
+
+class Company(models.Model):
+    first_name = models.CharField(max_length=55)
+    last_name = models.CharField(max_length=55)
+    state = models.CharField(max_length=55)
+    country = models.CharField(max_length=55)
+    mobile = models.CharField(max_length=55)
     
 class Course(models.Model):
     name = models.CharField(max_length=255)
