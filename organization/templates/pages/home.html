@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LMS Home</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #007bff;
+            padding: 10px 20px;
+            color: white;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            font-weight: bold;
+        }
+
+        .navbar a:hover {
+            background-color: #0056b3;
+            border-radius: 4px;
+        }
+
+        .hero-section {
+            background: url('https://example.com/hero-image.jpg') no-repeat center center/cover;
+            height: 80vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            background-blend-mode: darken;
+        }
+
+        .hero-section h1 {
+            font-size: 48px;
+            margin: 0;
+        }
+
+        .hero-section p {
+            font-size: 20px;
+            margin-top: 10px;
+        }
+
+        .container {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .container h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .courses-grid {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .course {
+            background-color: #f4f4f4;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 200px;
+            text-align: center;
+        }
+
+        .course img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .course h3 {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+
+        .course p {
+            font-size: 14px;
+        }
+
+        footer {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 40px;
+        }
+
+        .course-list {
+            display: none; /* Initially hide the course list */
+            position: absolute; /* Position it absolutely */
+            background-color: pink; /* Set a background for visibility */
+            border: 1px solid #ccc; /* Optional: add a border */
+            padding: 10px; /* Optional: add padding */
+            z-index: 1; /* Ensure it appears above other elements */
+        }
+
+        .available-courses:hover + .course-list {
+            display: block; /* Show course list on hover */
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <a href="#">LMS</a>
+        </div>
+        <div class="nav-links">
+            <a href="#">Home</a>
+            {% comment %} <a href="api/master/course/titles/">Courses</a> {% endcomment %}
+            <a href="/api/login/">Login</a>
+            <a href="/api/signup/">Register</a>
+        </div>
+        
+        <!-- Available Courses -->
+        <p class="available-courses">Available Courses</p>
+        <div class="course-list">
+            <ul>
+                {% for course in courses %}
+                    <li>{{ course.name }}</li>  <!-- Displaying the course title -->
+                {% empty %}
+                    <li>No courses available.</li>  <!-- Message if no courses are found -->
+                {% endfor %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div>
+            <h1>Welcome to LMS</h1>
+            <p>Discover courses, enhance your skills, and learn at your own pace.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 LMS. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>

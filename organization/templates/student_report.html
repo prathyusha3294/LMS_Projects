@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Performance Report</title>
+    {% load static %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        .comments {
+            margin-top: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Performance Report</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Quiz Title</th>
+                    <th>Score</th>
+                    <th>Comments</th>
+                </tr>
+            </thead>
+            <tbody id="report-body">
+                <!-- Report rows will be added here -->
+            </tbody>
+        </table>
+        <div class="comments" id="comments-section"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchStudentQuizSubmissions();
+        });
+
+        function fetchStudentQuizSubmissions() {
+            // Fetch data from the new API endpoint
+            fetch('/api/get-submission/')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const reportBody = document.getElementById('report-body');
+                    const commentsSection = document.getElementById('comments-section');
+
+                    // Clear existing data
+                    reportBody.innerHTML = '';
+                    commentsSection.innerHTML = '';
+
+                    // Populate the report
+                    data.forEach(submission => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${submission.student_name}</td>
+                            <td>${submission.quiz.title}</td>
+                            <td>${submission.score}</td>
+                            <td>${submission.comments || 'No comments'}</td>
+                        `;
+                        reportBody.appendChild(row);
+                    });
+
+                    // Show any overall comments (optional, depending on your API data)
+                    // Example if there are overall comments for all submissions
+                    // commentsSection.innerText = `Overall Comments: ${data.overall_comments}`;
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
+    </script>
+</body>
+</html>

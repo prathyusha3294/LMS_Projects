@@ -1,0 +1,82 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+h2, h3 {
+    color: #333;
+    text-align: center;
+}
+
+h2 {
+    margin-top: 20px;
+    font-size: 36px;
+    color: #4CAF50;
+}
+
+h3 {
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+/* Course List */
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 20px auto;
+    width: 60%;
+}
+
+li {
+    background-color: #fff;
+    margin: 10px 0;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+li:hover {
+    background-color: #f9f9f9;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+li span {
+    font-weight: bold;
+    color: #333;
+}
+
+a {
+    display: inline-block;
+    text-decoration: none;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-top: 20px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+a:hover {
+    background-color: #45a049;
+}
+
+a:active {
+    background-color: #388E3C;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #4CAF50;
+    color: white;
+    margin-top: 40px;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}

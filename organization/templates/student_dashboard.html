@@ -1,0 +1,38 @@
+{% extends "studentbase.html" %}
+{% load static %}
+{% block content %}
+<div class="dashboard-container" style="max-width: 800px; margin: 20px auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+    <h1 style="text-align: center; color: #333;">Student Dashboard</h1>
+    <h3 style="text-align: center; color: #333;">Available Courses</h3>
+    <ul style="list-style-type: none; padding: 0;">
+        {% for course in courses %}
+        <li style="padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between;">
+            <span style="color: #333;">{{ course.name }}</span> - {{ course.description }}
+            <span>
+                {% for quiz in course.quiz_set.all %}
+                    <button class="take-quiz-btn" 
+                            style="background-color: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;"
+                            onclick="window.location.href='/api/getquiz/{{ quiz.id }}'">
+                        Take Quiz
+                    </button>
+                {% endfor %}
+            </span>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- Hidden Quiz Container to be displayed when the student selects a quiz -->
+<div id="quiz-container" style="display: none; margin-top: 20px; background-color: #f9f9f9; padding: 20px; border-radius: 8px;">
+    <h2 id="quiz-title" style="color: #333;"></h2>
+    <form id="quiz-form" method="POST">
+        {% csrf_token %}
+        <!-- Quiz questions will be injected here by JavaScript -->
+    </form>
+    {% comment %} <button id="submit-quiz" style="display: none; background-color: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">
+        Submit Quiz
+    </button> {% endcomment %}
+</div>
+
+{% comment %} <script src="{% static 'js/quiz.js' %}"></script> {% endcomment %}
+{% endblock %}

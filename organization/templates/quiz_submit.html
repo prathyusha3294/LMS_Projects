@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results</title>
+    {% load static %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            color: #555;
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        strong {
+            color: #000;
+        }
+        .message {
+            font-size: 16px;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .warning {
+            background-color: #fcf8e3;
+            color: #8a6d3b;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quiz Results</h1>
+        {% comment %} <p><strong>Student Name:</strong> {{ student_name }}</p> {% endcomment %}
+        {% comment %} <p><strong>Quiz Title:</strong> {{ quiz.title }}</p> {% endcomment %}
+        <p><strong>Your Score:</strong> {{ score }} / {{ total_marks }}</p>
+
+        {% if score == total_marks %}
+            <div class="message success">Congratulations! You scored full marks!</div>
+        {% elif score > total_marks|divisibleby:2 %}
+            <div class="message warning">Good job! You passed the quiz.</div>
+        {% else %}
+            <div class="message error">Keep practicing! You can improve your score next time.</div>
+        {% endif %}
+    </div>
+</body>
+{% comment %} <script src="{% static 'js/quiz_submit.js' %}"></script> {% endcomment %}
+</html>

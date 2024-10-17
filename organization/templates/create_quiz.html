@@ -1,0 +1,135 @@
+<h2 style="text-align: center; color: #333;" id="formHeader">Create Quiz</h2>
+<form id="createQuizForm" method="post" style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 10px; background-color: #f9f9f9;">
+    {% csrf_token %}
+    
+    <!-- Quiz Title, Marks, and Course fields -->
+    <div id="newQuizFields">
+        <label for="title" style="display: block; margin-bottom: 10px; color: #555; font-weight: bold;">Quiz Title</label>
+        <input type="text" name="title" id="title" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">
+
+        <label for="marks" style="display: block; margin-bottom: 10px; color: #555; font-weight: bold;">Total Marks</label>
+        <input type="number" name="marks" id="marks" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">
+
+        <label for="course" style="display: block; margin-bottom: 10px; color: #555; font-weight: bold;">Course</label>
+        <select name="course" id="course" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">
+            <option value="" disabled selected>Select a course</option>
+            {% for course in courses %}
+            <option value="{{ course.id }}">{{ course.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Questions section -->
+    <div id="questionsContainer"></div>
+
+    <!-- Button to add a new question -->
+    <button type="button" id="addQuestionBtn" style="width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; font-size: 16px; margin-bottom: 15px;">Add Another Question</button>
+
+    <button type="submit" style="width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 5px; font-size: 16px;">Submit</button>
+</form>
+
+<!-- jQuery (ensure it's included) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script type="text/javascript">
+    let questionCount = 0;
+    let isAddingQuestionsToExistingQuiz = false; // Flag to check if adding questions to existing quiz
+    let existingQuizId = null; // Store the existing quiz ID if adding questions
+
+    $(document).ready(function() {
+        // Function to add question fields dynamically
+        function addQuestion() {
+            questionCount++;
+            const questionHtml = `
+                <div class="questionItem" style="margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    <label style="display: block; color: #555; font-weight: bold;">Question ${questionCount}</label>
+                    <textarea name="questions[${questionCount}][question_text]" required style="width: 100%; padding: 10px; margin-bottom: 10px;" placeholder="Type your question here"></textarea>
+                    
+                    <label style="display: block; color: #555; font-weight: bold;">Options</label>
+                    
+                    <input type="text" name="questions[${questionCount}][options][0]" required style="width: 100%; padding: 10px; margin-bottom: 10px;" placeholder="Option 1" />
+                    <input type="text" name="questions[${questionCount}][options][1]" required style="width: 100%; padding: 10px; margin-bottom: 10px;" placeholder="Option 2" />
+                    <input type="text" name="questions[${questionCount}][options][2]" required style="width: 100%; padding: 10px; margin-bottom: 10px;" placeholder="Option 3" />
+                    <input type="text" name="questions[${questionCount}][options][3]" required style="width: 100%; padding: 10px; margin-bottom: 10px;" placeholder="Option 4" />
+                    
+                    <label style="display: block; color: #555; font-weight: bold;">Correct Answer</label>
+                    <input type="text" name="questions[${questionCount}][correct_answer]" required style="width: 100%; padding: 10px; margin-bottom: 10px;" placeholder="Correct answer" />
+        
+                    <label style="display: block; color: #555; font-weight: bold;">Points</label>
+                    <input type="number" name="questions[${questionCount}][points]" required style="width: 100%; padding: 10px; margin-bottom: 10px;" placeholder="Points" />
+                </div>`;
+            
+            $('#questionsContainer').append(questionHtml);
+        }
+
+        // Trigger addQuestion on button click
+        $('#addQuestionBtn').click(addQuestion);
+
+        // Add one question by default on page load
+        addQuestion();
+
+        // Handle form submission
+        $('#createQuizForm').on('submit', function(e) {
+            e.preventDefault();
+
+            // Collect form data
+            const quizData = {
+                title: isAddingQuestionsToExistingQuiz ? null : $('#title').val(),
+                marks: isAddingQuestionsToExistingQuiz ? null : $('#marks').val(),
+                course: isAddingQuestionsToExistingQuiz ? null : $('#course').val(),
+                questions: [],
+                existing_quiz_id: isAddingQuestionsToExistingQuiz ? existingQuizId : null
+            };
+
+            // Collect each question
+            $('.questionItem').each(function() {
+                const question = {
+                    question_text: $(this).find('textarea').val(),
+                    options: [
+                        $(this).find('input[name*="options"][placeholder="Option 1"]').val(),
+                        $(this).find('input[name*="options"][placeholder="Option 2"]').val(),
+                        $(this).find('input[name*="options"][placeholder="Option 3"]').val(),
+                        $(this).find('input[name*="options"][placeholder="Option 4"]').val()
+                    ],
+                    correct_answer: $(this).find('input[name*="correct_answer"]').val(),
+                    points: $(this).find('input[name*="points"]').val()
+                };
+                quizData.questions.push(question);
+            });
+
+            // AJAX request to create or update quiz
+            $.ajax({
+                url: '/api/master/quiz/',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(quizData),
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    alert('Quiz saved successfully!');
+                    if (isAddingQuestionsToExistingQuiz) {
+                        // Reset the form for more questions if adding to existing quiz
+                        $('#questionsContainer').empty();
+                        questionCount = 0;
+                        addQuestion();
+                    } else {
+                        // Reset the form for new quiz creation
+                        $('#createQuizForm')[0].reset();
+                    }
+                },
+                error: function(response) {
+                    alert('Error saving quiz.');
+                }
+            });
+        });
+    });
+
+    // Function to toggle form for adding questions to an existing quiz
+    function enableAddingToExistingQuiz(quizId) {
+        isAddingQuestionsToExistingQuiz = true;
+        existingQuizId = quizId;
+        $('#formHeader').text('Add Questions to Existing Quiz');
+        $('#newQuizFields').hide(); // Hide title, marks, and course fields
+    }
+</script>
