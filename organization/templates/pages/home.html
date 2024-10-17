@@ -101,6 +101,19 @@
             padding: 10px 0;
             margin-top: 40px;
         }
+
+        .course-list {
+            display: none; /* Initially hide the course list */
+            position: absolute; /* Position it absolutely */
+            background-color: pink; /* Set a background for visibility */
+            border: 1px solid #ccc; /* Optional: add a border */
+            padding: 10px; /* Optional: add padding */
+            z-index: 1; /* Ensure it appears above other elements */
+        }
+
+        .available-courses:hover + .course-list {
+            display: block; /* Show course list on hover */
+        }
     </style>
 </head>
 <body>
@@ -111,9 +124,21 @@
         </div>
         <div class="nav-links">
             <a href="#">Home</a>
-            <a href="api/master/course/create">Courses</a>
+            {% comment %} <a href="api/master/course/titles/">Courses</a> {% endcomment %}
             <a href="/api/login/">Login</a>
             <a href="/api/signup/">Register</a>
+        </div>
+        
+        <!-- Available Courses -->
+        <p class="available-courses">Available Courses</p>
+        <div class="course-list">
+            <ul>
+                {% for course in courses %}
+                    <li>{{ course.name }}</li>  <!-- Displaying the course title -->
+                {% empty %}
+                    <li>No courses available.</li>  <!-- Message if no courses are found -->
+                {% endfor %}
+            </ul>
         </div>
     </nav>
 

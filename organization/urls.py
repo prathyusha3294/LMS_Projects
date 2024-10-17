@@ -7,6 +7,9 @@ app_name = 'organization'
 course_create_router = routers.SimpleRouter()
 course_create_router.register('master/course/create',CreateCourseViewSet,basename='create_course')
 
+course_titles_router = routers.SimpleRouter()
+course_titles_router.register('master/course/titles/', CourseTitlesView, basename='course_titles')
+
 # teacher_router = routers.SimpleRouter()
 # teacher_router.register('master/course', TeacherCourseViewSet, basename = 'teacher')
 
@@ -31,12 +34,13 @@ performance_report_router.register('performance/report',PerformanceReportViewSet
 teacher_router = routers.SimpleRouter()
 teacher_router.register('master/teacher',TeacherViewset, basename='teacher')
 
-signup_report_router = routers.SimpleRouter()
-signup_report_router.register('signup',UserSignUpViewSet, basename='usersignup')
+# signup_report_router = routers.SimpleRouter()
+# signup_report_router.register('signup',UserSignUpViewSet, basename='usersignup')
 
 
 urlpatterns = [
     path('',include(course_create_router.urls)),
+    path('',include(course_titles_router.urls)),
     path('',include(teacher_router.urls)),
     path('',include(quiz_router.urls)),
     path('',include(quizretrive_router.urls)),
@@ -44,5 +48,5 @@ urlpatterns = [
     path('',include(student_router.urls)),
     path('',include(student_submission_router.urls)),
     path('',include(performance_report_router.urls)),
-    path('',include(signup_report_router.urls))
+    # path('',include(signup_report_router.urls))
 ]
