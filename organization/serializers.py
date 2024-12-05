@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from .models import Course, Quiz, Question, StudentQuizSubmission, PerformanceReport
+from .models import Course, Quiz, Question, StudentQuizSubmission, PerformanceReport,UserProfile
+from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, login
 
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -46,12 +48,30 @@ class PerformanceReportSerializer(serializers.ModelSerializer):
         model = PerformanceReport
         fields = ['student', 'quiz', 'total_marks', 'marks_obtained', 'grade']
 
-class UserSignUpSerializer(serializers.Serializer):
-    role = serializers.CharField(write_only=True)
-    password = serializers.CharField(write_only=True, required=True)
-    mobile = serializers.CharField(required=False,allow_blank=True)
-    email = serializers.CharField(required=True)
-    first_name = serializers.CharField(required=True)
-    last_name = serializers.CharField(required=True)
-    state = serializers.CharField(required=True)
-    country = serializers.CharField(required=True)
+class SignUpSerializer(serializers.ModelSerializer):
+    role = serializers.ChoiceField(choices=UserProfile.ROLE_CHOICES)
+
+    class Meta:
+        model = get_user_model()
+        fields = ['username', 'email', 'password','role']  
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        User = get_user_model()  # Get the user model class
+        role = validated_data.pop('role')  # Extract the role from validated_data
+
+        user = User(
+            username=validated_data['username'],
+            email=validated_data['email']
+        )
+        user.set_password(validated_data['password'])  # Set the password correctly
+        user.save()
+
+        # Create user profile with the extracted role
+        UserProfile.objects.create(user=user, role=role)
+        return user
+
+
+class SignInSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField()

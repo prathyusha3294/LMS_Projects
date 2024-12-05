@@ -8,7 +8,7 @@ course_create_router = routers.SimpleRouter()
 course_create_router.register('master/course/create',CreateCourseViewSet,basename='create_course')
 
 course_titles_router = routers.SimpleRouter()
-course_titles_router.register('master/course/titles/', CourseTitlesView, basename='course_titles')
+course_titles_router.register('master/course/titles', CourseTitlesView, basename='course_titles')
 
 # teacher_router = routers.SimpleRouter()
 # teacher_router.register('master/course', TeacherCourseViewSet, basename = 'teacher')
@@ -34,8 +34,11 @@ performance_report_router.register('performance/report',PerformanceReportViewSet
 teacher_router = routers.SimpleRouter()
 teacher_router.register('master/teacher',TeacherViewset, basename='teacher')
 
-# signup_report_router = routers.SimpleRouter()
-# signup_report_router.register('signup',UserSignUpViewSet, basename='usersignup')
+# signup_router = routers.SimpleRouter()
+# signup_router.register('signup',SignUpView, basename='usersignup')
+
+# login_router = routers.SimpleRouter()
+# login_router.register('login', SignInView, basename='usersignin')
 
 
 urlpatterns = [
@@ -48,5 +51,8 @@ urlpatterns = [
     path('',include(student_router.urls)),
     path('',include(student_submission_router.urls)),
     path('',include(performance_report_router.urls)),
-    # path('',include(signup_report_router.urls))
+    # path('',include(signup_router.urls)),
+    # path('',include(login_router.urls)),
+    # path('register/', signup_page, name='signup'),
+    # path('signin/', signin_page, name='signin')
 ]

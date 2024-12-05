@@ -11,14 +11,21 @@ from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.models import Group
 from rest_framework.views import APIView
+from django.contrib.auth import authenticate, login
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.hashers import make_password
+from rest_framework.authtoken.models import Token
 
 class CourseTitlesView(viewsets.ModelViewSet):
-    queryset = Course.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = CourseSerializer
 
-    def get(self, request, *args, **kwargs):
-        courses = Course.objects.filter(teacher=request.user).values('title')  # Fetch only the course titles
-        course_titles = [course['title'] for course in courses]
-        return render(request, 'home.html', {'courses': courses}) 
+    def list(self, request, *args, **kwargs):
+        courses = Course.objects.all()  # Fetch all course objects\
+        return render(request, 'pages/home.html', {'courses': courses})
     
 class CreateCourseViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -207,5 +214,4 @@ class PerformanceReportViewSet(viewsets.ModelViewSet):
             return 'C'
         else:
             return 'F'
-        
         

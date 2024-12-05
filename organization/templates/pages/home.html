@@ -17,6 +17,7 @@
             background-color: #007bff;
             padding: 10px 20px;
             color: white;
+            position: relative; /* Added to position the dropdown */
         }
 
         .navbar a {
@@ -102,18 +103,25 @@
             margin-top: 40px;
         }
 
+        .available-courses-container {
+            position: relative; /* Ensure positioning context for the dropdown */
+        }
+
         .course-list {
             display: none; /* Initially hide the course list */
             position: absolute; /* Position it absolutely */
-            background-color: pink; /* Set a background for visibility */
+            background-color: white; /* Set a background for visibility */
+            color:black;
             border: 1px solid #ccc; /* Optional: add a border */
             padding: 10px; /* Optional: add padding */
             z-index: 1; /* Ensure it appears above other elements */
+            top: 100%; /* Position it below the trigger element */
+            left: 0;
         }
 
-        .available-courses:hover + .course-list {
-            display: block; /* Show course list on hover */
-        }
+        .available-courses-container:hover .course-list {
+            display: block;
+        }        
     </style>
 </head>
 <body>
@@ -126,19 +134,19 @@
             <a href="#">Home</a>
             {% comment %} <a href="api/master/course/titles/">Courses</a> {% endcomment %}
             <a href="/api/login/">Login</a>
-            <a href="/api/signup/">Register</a>
+            <a href="/api/register/">Register</a>
         </div>
         
-        <!-- Available Courses -->
-        <p class="available-courses">Available Courses</p>
-        <div class="course-list">
-            <ul>
-                {% for course in courses %}
-                    <li>{{ course.name }}</li>  <!-- Displaying the course title -->
-                {% empty %}
-                    <li>No courses available.</li>  <!-- Message if no courses are found -->
-                {% endfor %}
-            </ul>
+        <div class="available-courses-container">
+            <a href="/api/master/course/titles/" class="available-courses">Available Courses</a>
+            <div class="course-list">
+                <ul>
+                    {% for course in courses %}
+                        <li>{{ course.name }}</li>  
+                    {% empty %}
+                    {% endfor %}
+                </ul>
+            </div>  
         </div>
     </nav>
 
